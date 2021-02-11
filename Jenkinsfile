@@ -9,7 +9,7 @@ pipeline {
 	 
   }
   stages {
-    stage('Checkout') {
+    stage('Checkout SCM') {
       steps {
         checkout scm
         sh 'mkdir -p creds'
@@ -31,7 +31,7 @@ pipeline {
         //sh 'gcloud docker -- push $imageTag/$APP_NAME:latest'		 
       }
     }
-    stage('Deploy Application') {
+    stage('Application Deployment') {
       steps {
         sh 'kubectl create ns $namespace'
         sh 'sed -i.bak 's#gcr.io/$PROJECT_ID/$APP_NAME:v1#$imageTag' ./*.yaml'
