@@ -34,7 +34,7 @@ pipeline {
     stage('Application Deployment') {
       steps {
         sh 'kubectl create ns $namespace'
-        sh 'sed -i 's/gcr.io\/$PROJECT_ID\/$APP_NAME:v1/\$imageTag' ./*.yaml'
+        sh "sed -i 's/gcr.io\/$PROJECT_ID\/$APP_NAME:v1/\$imageTag' ./*.yaml"
         sh 'kubectl --namespace=$namespace apply -f tomcat.yaml'
         sh 'echo http://`kubectl --namespace=$namespace get service/$feSvcName --output=json | jq -r '.status.loadBalancer.ingress[0].ip'` > $feSvcName'		
       }
