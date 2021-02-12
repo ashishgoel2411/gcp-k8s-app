@@ -18,19 +18,20 @@ pipeline {
       }
     }
     stage('Build Image') {
-      steps {
-        sh 'echo $PROJECT_ID $APP_NAME'	  
-        sh 'env'
-        sh 'docker image build -t $imageTag .'
-        //sh 'docker image tag $APP_NAME:v1.$BUILD_NUMBER $imageTag/$APP_NAME:v1.$BUILD_NUMBER'
-        //sh 'docker image tag $APP_NAME:v1.$BUILD_NUMBER $imageTag/$APP_NAME:latest'
+	  steps {
+        script {
+          demoapp = docker.build("$imageTag")
+        }
       }
     }
     stage("Push Image") {
-      steps {
-        sh 'gcloud docker -- push $imageTag'
-        //sh 'gcloud docker -- push $imageTag/$APP_NAME:latest'		 
-      }
+	  steps {
+        script {
+          docker.withRegistry('gcr.io', 'gcr:$PROJECT_ID') {
+            demoapp.push("$imageTag")
+          }
+        }
+      }	  
     }
     stage('Application Deployment') {
       steps {
