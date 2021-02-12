@@ -35,13 +35,15 @@ pipeline {
 	  steps {
         script {
           docker.withRegistry('https://gcr.io', 'gcr:gcr-credentials') {
-            demoapp.push("latest")
+            demoapp.push("$BUILD_NUMBER")
           }
         }
       }	  
     }
     stage('Application Deployment') {
       steps {
+        sh 'curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"'  
+        sh 'chmod u+x ./kubectl'  
         sh 'kubectl create ns $namespace'
         sh "sed -i 's/$appTag/$imageTag' ./*.yaml"
         sh 'kubectl --namespace=$namespace apply -f tomcat.yaml'
