@@ -35,7 +35,7 @@ pipeline {
 	  steps {
         script {
           docker.withRegistry('https://gcr.io', 'gcr:gcr-credentials') {
-            demoapp.push("$imageTag")
+            demoapp.push("latest")
           }
         }
       }	  
