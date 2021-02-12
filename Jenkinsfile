@@ -24,15 +24,6 @@ pipeline {
         }
       }
     }	
-	
-sudo apt-get update -y && sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common gnupg2 vim strace binutils psmisc lsof
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key --keyring /etc/apt/trusted.gpg.d/docker.gpg add -
-
-add-apt-repository \
-"deb [arch=amd64] https://download.docker.com/linux/ubuntu \
-$(lsb_release -cs) \
-stable"
-	
     stage('Build Image') {
 	  steps {
         script {
