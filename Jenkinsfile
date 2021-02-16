@@ -4,7 +4,6 @@ pipeline {
      SVC_ACCOUNT_KEY = credentials('terraform-auth')
      PROJECT_ID = 'stoked-genius-302113'
 	 APP_NAME = 'tomcatapp'
-	 appTag = 'gcr.io/$PROJECT_ID/$APP_NAME:v1'
      imageTag = 'gcr.io/$PROJECT_ID/$APP_NAME:v1.$BUILD_NUMBER'
      namespace = 'tomcat'
 	 
@@ -43,11 +42,13 @@ pipeline {
     stage('Application Deployment') {
       steps {
         sh 'curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"'  
-        sh 'chmod u+x ./kubectl'  
+        sh 'chmod u+x ./kubectl'
+        sh 'export PATH=$PATH:$HOME'		
+        sh 'sshpass -p 'demo123' scp demo@k8s-master.us-central1-c.c.stoked-genius-302113.internal:/home/demo/.kube/config .kube/config'
         sh 'kubectl create ns $namespace'
-        sh "sed -i 's/$appTag/$imageTag' ./*.yaml"
+        sh 'sed -i "s/tomcatapp:v1/tomcatapp:v1.$BUILD_NUMBER/g" tomcat.yaml'		
         sh 'kubectl --namespace=$namespace apply -f tomcat.yaml'
-        sh "echo http://`kubectl --namespace=$namespace get service/$feSvcName --output=json | jq -r '.status.loadBalancer.ingress[0].ip'` > $feSvcName"		
+        //sh "echo http://`kubectl --namespace=$namespace get service/$feSvcName --output=json | jq -r '.status.loadBalancer.ingress[0].ip'` > $feSvcName"		
       }
     }
   }

@@ -2,9 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: tomcat-deployment
-  namespace: tomcat  
+  namespace: tomcat
+  labels:
+    app: tomcat  
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: tomcat  
@@ -15,11 +17,13 @@ spec:
         app: tomcat
     spec:
       containers:
-      - image: gcr.io/stoked-genius-302113/tomcatapp:v1
-        name: tomcatapp
+      - image: gcr.io/stoked-genius-302113/tomcatapp:v1.3
+        name: tomcat
         ports:
-        - containerPort: 8080       
+        - containerPort: 8080
 
+---
+    
 apiVersion: v1
 kind: Service
 metadata:
