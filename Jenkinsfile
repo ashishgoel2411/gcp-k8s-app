@@ -33,7 +33,7 @@ pipeline {
     stage("Push Image") {
 	  steps {
         script {
-          docker.withRegistry('https://gcr.io', 'gcr:SVC_ACCOUNT_KEY') {
+          docker.withRegistry('https://gcr.io', 'gcr:gcr-credentials') {
             demoapp.push("$BUILD_NUMBER")
           }
         }
