@@ -48,7 +48,7 @@ pipeline {
         sh 'kubectl create ns $namespace'
         sh 'cp tomcat.yaml tomcat-$BUILD_NUMBER.yaml'
         sh 'sed -i "s/tomcatapp:v1/tomcatapp:v1.$BUILD_NUMBER/g" tomcat-$BUILD_NUMBER.yaml'
-        sh "kubectl create secret docker-registry gcr-json-key --docker-server=gcr.io --docker-username=_json_key --docker-password="$(cat ./creds/demoaccount.json)" --docker-email=demoaccount@stoked-genius-302113.iam.gserviceaccount.com -n tomcat"
+        sh 'kubectl create secret docker-registry gcr-json-key --docker-server=gcr.io --docker-username=_json_key --docker-password="$(cat ./creds/demoaccount.json)" --docker-email=demoaccount@stoked-genius-302113.iam.gserviceaccount.com -n tomcat'
         sh 'kubectl --namespace=$namespace apply -f tomcat-$BUILD_NUMBER.yaml'
         sh 'sleep 10'			
         sh 'rm tomcat-$BUILD_NUMBER.yaml'	
