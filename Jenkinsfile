@@ -33,7 +33,7 @@ pipeline {
 	  steps {
         script {
           docker.withRegistry('https://gcr.io', 'gcr:gcr-credentials') {
-            demoapp.push("$BUILD_NUMBER")
+            demoapp.push("v1.$BUILD_NUMBER")
           }
         }
       }	  
