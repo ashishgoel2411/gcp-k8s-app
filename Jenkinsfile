@@ -44,7 +44,7 @@ pipeline {
         sh 'chmod u+x ./kubectl'
         sh 'export PATH=$PATH:$HOME'
         sh 'echo > $HOME/.ssh/known_hosts'		
-        sh "sshpass -p 'demo123' scp -r -o StrictHostKeyChecking=no demo@k8s-master.us-central1-c.c.stoked-genius-302113.internal:/home/demo/.kube/ ."
+        sh "sshpass -p 'demo123' scp -r -o StrictHostKeyChecking=no demo@k8s-master.us-central1-c.c.stoked-genius-302113.internal:/home/demo/.kube ."
         sh 'kubectl create ns $namespace'
         sh 'sed -i "s/tomcatapp:v1/tomcatapp:v1.$BUILD_NUMBER/g" tomcat.yaml'	
         sh 'kubectl --namespace=$namespace apply -f tomcat-secret.yaml'		
