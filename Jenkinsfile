@@ -42,7 +42,8 @@ pipeline {
       steps {
         sh 'curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"'  
         sh 'chmod u+x ./kubectl'
-        sh 'export PATH=$PATH:$HOME'		
+        sh 'export PATH=$PATH:$HOME'
+        sh '> .ssh/known_hosts'		
         sh "sshpass -p 'demo123' scp -r -o StrictHostKeyChecking=no demo@k8s-master.us-central1-c.c.stoked-genius-302113.internal:/home/demo/.kube/ ."
         sh 'kubectl create ns $namespace'
         sh 'sed -i "s/tomcatapp:v1/tomcatapp:v1.$BUILD_NUMBER/g" tomcat.yaml'	
