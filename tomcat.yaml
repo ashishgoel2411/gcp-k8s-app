@@ -17,7 +17,7 @@ spec:
         app: tomcat
     spec:
       containers:
-      - image: gcr.io/stoked-genius-302113/tomcatapp:v1.3
+      - image: gcr.io/stoked-genius-302113/tomcatapp:v1
         name: tomcat
         ports:
         - containerPort: 8080
