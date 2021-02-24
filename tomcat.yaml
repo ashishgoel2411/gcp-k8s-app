@@ -32,11 +32,10 @@ metadata:
   name: tomcat-service
   namespace: tomcat  
 spec:
+  type: LoadBalancer
   selector:
     app: tomcat
   ports:
   - protocol: TCP
     port: 80
     targetPort: 8080
-  type: LoadBalancer
-  

@@ -5,7 +5,9 @@ pipeline {
       PROJECT_ID = 'stoked-genius-302113'
 	  APP_NAME = 'tomcatapp'
       imageTag = 'gcr.io/$PROJECT_ID/$APP_NAME:v1.$BUILD_NUMBER'
-      namespace = 'tomcat'
+      TOMCAT_NS = 'tomcat-ns'
+      POSTGRES_NS = 'postgres-ns'
+      RABBITMQ_NS = 'rabbitmq-ns'	  
    }
   stages {
     stage('Checkout SCM') {
@@ -38,24 +40,38 @@ pipeline {
         }
       }	  
     }
-    stage('Application Deployment') {
+    stage('Tomcat Deployment') {
       steps {
         sh 'curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"'  
         sh 'chmod u+x ./kubectl'
         sh 'export PATH=$PATH:$HOME'
-        sh 'rm -rf $HOME/.kube'
-        sh 'mkdir $HOME/.kube'	
         sh 'echo > $HOME/.ssh/known_hosts'		
-        sh 'sshpass -p "demo123" scp -rpq -o StrictHostKeyChecking=no demo@k8s-master.us-central1-c.c.stoked-genius-302113.internal:/home/demo/.kube/* $HOME/.kube/'
-        sh 'kubectl create ns $namespace'
+        sh "sshpass -p 'demo123' scp -r -o StrictHostKeyChecking=no demo@k8s-master.us-central1-c.c.stoked-genius-302113.internal:/home/demo/.kube ."
+        sh 'kubectl create ns $TOMCAT_NS'
         sh 'cp tomcat.yaml tomcat-$BUILD_NUMBER.yaml'
         sh 'sed -i "s/tomcatapp:v1/tomcatapp:v1.$BUILD_NUMBER/g" tomcat-$BUILD_NUMBER.yaml'
         sh 'kubectl create secret docker-registry gcr-json-key --docker-server=gcr.io --docker-username=_json_key --docker-password="$(cat ./creds/demoaccount.json)" --docker-email=demoaccount@stoked-genius-302113.iam.gserviceaccount.com -n tomcat'
-        sh 'kubectl --namespace=$namespace apply -f tomcat-$BUILD_NUMBER.yaml'
+        sh 'kubectl --namespace=$TOMCAT_NS apply -f tomcat-$BUILD_NUMBER.yaml'
         sh 'sleep 10'			
-        sh 'rm tomcat-$BUILD_NUMBER.yaml'	
-        //sh "echo http://`kubectl --namespace=$namespace get service/$feSvcName --output=json | jq -r '.status.loadBalancer.ingress[0].ip'` > $feSvcName"		
+        sh 'rm tomcat-$BUILD_NUMBER.yaml'		
       }
     }
+    stage('Postgres Deployment') {
+      steps {
+        sh 'kubectl create ns $POSTGRES_NS'
+        sh 'kubectl --namespace=$POSTGRES_NS apply -f postgres.yaml'
+        sh 'sleep 10'			
+      }
+    }
+    stage('RabbitMQ Deployment') {
+      steps {
+        sh 'kubectl create ns $RABBITMQ_NS'
+        //sh 'kubectl run etcd --image=microbox/etcd --port=4001 --namespace=$RABBITMQ_NS -- --name etcd'
+        //sh 'kubectl --namespace=$RABBITMQ_NS expose deployment etcd'
+        //sh 'kubectl create secret generic --namespace=$RABBITMQ_NS erlang.cookie --from-file=./erlang.cookie'		
+        sh 'kubectl --namespace=$RABBITMQ_NS apply -f rabbitmq.yaml'
+        sh 'sleep 10'			
+      }
+    }	
   }
 }
