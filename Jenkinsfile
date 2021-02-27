@@ -40,11 +40,19 @@ pipeline {
         }
       }	  
     }
+    stage('Postgres Deployment') {
+      steps {
+        sh 'kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml'
+      }
+    }	
+	
+	
     stage('Tomcat Deployment') {
       steps {
         sh 'curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"'  
         sh 'chmod u+x ./kubectl'
         sh 'export PATH=$PATH:$HOME'
+        sh 'rm $HOME/workspace/application-deployment/tomcat-*.yaml'		
         sh 'rm -rf $HOME/.kube'
         sh 'mkdir $HOME/.kube'		
         sh 'echo > $HOME/.ssh/known_hosts'		
@@ -55,7 +63,6 @@ pipeline {
         sh 'kubectl create secret docker-registry gcr-json-key --docker-server=gcr.io --docker-username=_json_key --docker-password="$(cat ./creds/demoaccount.json)" --docker-email=demoaccount@stoked-genius-302113.iam.gserviceaccount.com -n $TOMCAT_NS'
         sh 'kubectl --namespace=$TOMCAT_NS apply -f tomcat-$BUILD_NUMBER.yaml'
         sh 'sleep 10'			
-        sh 'rm tomcat-$BUILD_NUMBER.yaml'		
       }
     }
     stage('Postgres Deployment') {
