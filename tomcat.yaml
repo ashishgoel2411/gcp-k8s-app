@@ -4,12 +4,12 @@ metadata:
   name: tomcat-deployment
   namespace: tomcat-ns
   labels:
-    app: tomcat  
+    app: tomcat
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
-      app: tomcat  
+      app: tomcat
   template:
     metadata:
       name: tomcat
@@ -21,14 +21,19 @@ spec:
         name: tomcat
         ports:
         - containerPort: 8080
+        resources:
+          limits:
+            cpu: 500m
+          requests:
+            cpu: 100m
       imagePullSecrets:
-      - name: gcr-json-key 
+      - name: gcr-json-key
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: tomcat-service
-  namespace: tomcat-ns  
+  namespace: tomcat-ns
 spec:
   type: LoadBalancer
   selector:
@@ -37,46 +42,3 @@ spec:
   - protocol: TCP
     port: 80
     targetPort: 8080
----
-apiVersion: autoscaling/v2beta2
-kind: HorizontalPodAutoscaler
-metadata:
-  name: tomcat-hpa
-  namespace: tomcat-ns  
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: tomcat-deployment
-  minReplicas: 2
-  maxReplicas: 3
-  metrics:
-  - type: Resource
-    resource:
-      name: cpu
-      target:
-        type: Utilization
-        averageUtilization: 20
-  - type: Resource
-    resource:
-      name: memory
-      target:
-        type: AverageValue
-        averageValue: 256Mi        
-status:
-  observedGeneration: 1
-  currentReplicas: 2
-  desiredReplicas: 2
-  currentMetrics:
-  - type: Resource
-    resource:
-      name: cpu
-      current:
-        averageUtilization: 0
-        averageValue: 0
-  - type: Resource
-    resource:
-      name: memory
-      current:
-        averageUtilization: 0
-        averageValue: 0
