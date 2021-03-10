@@ -58,7 +58,7 @@ pipeline {
     }
     stage('Tomcat Deployment') {
       steps {
-        sh 'rm $HOME/workspace/application-deployment/tomcat-*.yaml 2> /dev/null'
+        //sh 'rm $HOME/workspace/application-deployment/tomcat-*.yaml 2> /dev/null'
         sh 'kubectl create ns $TOMCAT_NS'
         sh 'cp tomcat.yaml tomcat-$BUILD_NUMBER.yaml'
         sh 'sed -i "s/tomcatapp:v1/tomcatapp:v1.$BUILD_NUMBER/g" tomcat-$BUILD_NUMBER.yaml'
