@@ -45,7 +45,6 @@ pipeline {
         sh 'curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"'  
         sh 'chmod u+x ./kubectl'
         sh 'export PATH=$PATH:$HOME'
-        sh 'rm $HOME/workspace/application-deployment/tomcat-*.yaml'		
         sh 'rm -rf $HOME/.kube'
         sh 'mkdir $HOME/.kube'		
         sh 'echo > $HOME/.ssh/known_hosts'		
@@ -59,12 +58,13 @@ pipeline {
     }
     stage('Tomcat Deployment') {
       steps {
+        sh 'rm $HOME/workspace/application-deployment/tomcat-*.yaml 2> /dev/null'
         sh 'kubectl create ns $TOMCAT_NS'
         sh 'cp tomcat.yaml tomcat-$BUILD_NUMBER.yaml'
         sh 'sed -i "s/tomcatapp:v1/tomcatapp:v1.$BUILD_NUMBER/g" tomcat-$BUILD_NUMBER.yaml'
         sh 'kubectl create secret docker-registry gcr-json-key --docker-server=gcr.io --docker-username=_json_key --docker-password="$(cat ./creds/demoaccount.json)" --docker-email=demoaccount@stoked-genius-302113.iam.gserviceaccount.com -n $TOMCAT_NS'
         sh 'kubectl --namespace=$TOMCAT_NS apply -f tomcat-$BUILD_NUMBER.yaml'
-        sh 'sleep 10'			
+        sh 'sleep 10'
       }
     }
     stage('Postgres Deployment') {
