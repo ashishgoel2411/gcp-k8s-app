@@ -56,6 +56,11 @@ pipeline {
         sh 'kubectl apply -f metrics-server.yaml'
       }
     }
+    stage('Taint master for NoScheduled') {
+      steps {
+        sh 'kubectl taint nodes k8s-master node-role.kubernetes.io/k8s-master:NoSchedule'
+      }
+    }	
     stage('Tomcat Deployment') {
       steps {
         //sh 'rm $HOME/workspace/application-deployment/tomcat-*.yaml 2> /dev/null'
