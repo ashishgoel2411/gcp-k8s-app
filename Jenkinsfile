@@ -2,7 +2,7 @@ pipeline {
   agent any
     environment {
       SVC_ACCOUNT_KEY = credentials('terraform-auth')
-      PROJECT_ID = 'stoked-genius-302113'
+      PROJECT_ID = 'chaos-engineering-308202'
 	  APP_NAME = 'tomcatapp'
       imageTag = 'gcr.io/$PROJECT_ID/$APP_NAME:v1.$BUILD_NUMBER'
       TOMCAT_NS = 'tomcat-ns'
@@ -48,7 +48,7 @@ pipeline {
         sh 'rm -rf $HOME/.kube'
         //sh 'mkdir $HOME/.kube'		
         sh 'echo > $HOME/.ssh/known_hosts'		
-        sh "sshpass -p 'demo123' scp -r -o StrictHostKeyChecking=no demo@k8s-master.us-central1-c.c.stoked-genius-302113.internal:/home/demo/.kube/* $HOME/.kube/"
+        sh "sshpass -p 'demo123' scp -r -o StrictHostKeyChecking=no demo@k8s-master.us-central1-c.c.chaos-engineering-308202.internal:/home/demo/.kube/* $HOME/.kube/"
        }
     }
     stage('Metrics Server Deployment') {
@@ -67,7 +67,7 @@ pipeline {
         sh 'kubectl create ns $TOMCAT_NS'
         sh 'cp tomcat.yaml tomcat-$BUILD_NUMBER.yaml'
         sh 'sed -i "s/tomcatapp:v1/tomcatapp:v1.$BUILD_NUMBER/g" tomcat-$BUILD_NUMBER.yaml'
-        sh 'kubectl create secret docker-registry gcr-json-key --docker-server=gcr.io --docker-username=_json_key --docker-password="$(cat ./creds/demoaccount.json)" --docker-email=demoaccount@stoked-genius-302113.iam.gserviceaccount.com -n $TOMCAT_NS'
+        sh 'kubectl create secret docker-registry gcr-json-key --docker-server=gcr.io --docker-username=_json_key --docker-password="$(cat ./creds/demoaccount.json)" --docker-email=demoaccount@chaos-engineering-308202.iam.gserviceaccount.com -n $TOMCAT_NS'
         sh 'kubectl --namespace=$TOMCAT_NS apply -f tomcat-$BUILD_NUMBER.yaml'
         sh 'sleep 10'
       }
