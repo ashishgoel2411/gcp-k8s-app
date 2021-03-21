@@ -46,7 +46,8 @@ pipeline {
         sh 'chmod u+x ./kubectl'
         sh 'export PATH=$PATH:$HOME'
         sh 'rm -rf $HOME/.kube'
-        //sh 'mkdir $HOME/.kube'		
+        sh 'mkdir $HOME/.kube'
+        sh 'mkdir $HOME/.ssh'		
         sh 'echo > $HOME/.ssh/known_hosts'		
         sh "sshpass -p 'demo123' scp -r -o StrictHostKeyChecking=no demo@k8s-master.us-central1-c.c.chaos-engineering-308202.internal:/home/demo/.kube/* $HOME/.kube/"
        }
