@@ -46,6 +46,7 @@ pipeline {
         sh 'chmod u+x ./kubectl'
         sh 'export PATH=$PATH:$HOME'
         sh 'rm -rf $HOME/.kube'
+        sh 'rm -rf $HOME/.ssh'
         sh 'mkdir $HOME/.kube'
         sh 'mkdir $HOME/.ssh'		
         sh 'echo > $HOME/.ssh/known_hosts'		
